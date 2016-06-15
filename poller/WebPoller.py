@@ -5,8 +5,14 @@ import logging
 import json
 import sys
 from logging.config import fileConfig
-import ConfigParser
 import os
+import sys
+
+if sys.version_info.major == 3:
+    import configparser
+else:
+    import ConfigParser
+
 
 # All the official connection types
 # See https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
