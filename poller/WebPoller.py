@@ -77,7 +77,10 @@ CONNECTION_TYPES = {
     511: "Network Authentication Required (RFC 6585)"
 }
 
-def logger_webpoller_factory(settings_file, sections):
+EXCEPTED_SECTIONS = {"main": ["time_period", "pages"],
+                     "logging": ["settings"]}
+
+def logger_webpoller_factory(settings_file, sections=EXCEPTED_SECTIONS):
     """
     """
     # Create config parser and read configs
@@ -173,7 +176,7 @@ def get_html(url, logger=None):
                               status_code]
         res["obj"] = response
         res["connected"] = True
-    except requests.exceptions.ConnectionError as err:
+    except (requests.exceptions.ConnectionError, requests.exceptions.MissingSchema) as err:
         if logger != None:
             logger.error(err)
         else:
@@ -182,6 +185,18 @@ def get_html(url, logger=None):
         res["obj"] = None
         res["status_code"] = [None, None]
     return res
+
+def _rule_mapper(hook, searched_value, expected_value):
+    '''
+    '''
+    searched_as_string = str(searched_value)
+    expected_as_string = str(expected_value)
+    return_val = None
+    if searched_as_string == 'None':
+        return_val = str(hook()) == expected_as_string
+    else:
+        return_val = str(hook(searched_as_string)) == expected_as_string
+    return str(return_val)
 
 
 def check_rule_output(rules, resp_as_text):
@@ -206,7 +221,8 @@ def check_rule_output(rules, resp_as_text):
     expected_values = {}
     for method, expected in rules.items():
         method_hook = getattr(resp_as_text, method)
-        expected_values[method] = map(lambda inp: str(str(method_hook(inp[0])) == inp[1]), expected)
+        hook_wrapper = lambda x: _rule_mapper(method_hook, x[0], x[1])
+        expected_values[method] = map(hook_wrapper, expected)
     return expected_values
 
 
@@ -241,10 +257,54 @@ class WebPoller(threading.Thread):
                 Logger for logging purposes
         """
         threading.Thread.__init__(self)
-        self.poll_sites = poll_sites
-        self.period_time = float(period_time)
+        self.poll_sites  = self._check_pollsite_structure(poll_sites)
+        self.period_time = self._check_period_time(period_time)
         self._init_status_dict()
         self._init_logger(logger)
+
+    def _check_pollsite_structure(self, poll_sites):
+        """
+        Checks that poll_site dictionary has a valid format
+        """
+        if type(poll_sites) != dict:
+            raise TypeError("Given poll_site argument is not a dictiory")
+
+        keys = poll_sites.keys()
+        string_methods = dir(str)
+        for each in keys:
+            vals = poll_sites[each]
+            if type(vals) != dict:
+                raise TypeError("Site: {0}, does not have dictionary type value".format(each))
+            if "rules" not in vals.keys():
+                raise KeyError("'rules' keyword not found in {each}")
+            rule_dict = vals["rules"]
+            if type(rule_dict) != dict:
+                raise TypeError("Site: {0}, with key: {1} does not have dictionary type value".format(each, "rules"))
+            method_names = rule_dict.keys()
+            if not all(map(lambda x: x in string_methods, method_names)):
+                raise Exception("Site: {0}, not all method names found from string methods. "+
+                 "Please check following method names: {1}".format(each, ", ".join(method_names)))
+
+            for each_method in method_names:
+                method_args = rule_dict[each_method]
+                if type(method_args) != list:
+                    raise TypeError("Site: {0}, with method: {1}, value is not list".format(each, each_method))
+                if not all(map(lambda x: type(x) == list and len(x) == 2, method_args)):
+                    raise Exception("Site: {0}, with method: {1}, in the argument list," +
+                    " not all are lists or there are more than two (2) elements in the list." +
+                     "Please check following method names: {1}".format(each, each_method, ", ".join(method_names)))
+
+        return poll_sites
+
+
+    def _check_period_time(self, period_time):
+        """
+        Checks that period time is a number
+        """
+        try:
+            return float(period_time)
+        except ValueError:
+            raise ValueError("Period time is not a number.")
 
     def _init_logger(self, logger):
         """Initialize logger
@@ -291,7 +351,7 @@ class WebPoller(threading.Thread):
                     status_code_list = response["status_code"]
                 else:
                     rule_output = []
-
+                print(response)
                 # Update values to poll dictionary
                 self.poll_dict[url]["status_code"]   = response["status_code"]
                 self.poll_dict[url]["response_time"] = resp_time
@@ -303,8 +363,7 @@ class WebPoller(threading.Thread):
                 self.logger.info(" *** Response time: {0:.3f} seconds.".format(resp_time))
                 self.logger.info(" *** Status: {0}, code: {1}.".format(*status_code_list))
                 for rule_name, list_vals in rule_output.items():
-                    self.logger.info(" *** Rule: {0}, output: {1}".format(
-                        rule_name, ", ".join(list_vals)))
+                    self.logger.info(" *** Rule: {0}, output: {1}".format(rule_name, ", ".join(list_vals)))
 
             self.logger.info(" ---- Sleeping {0} seconds ---- ".format(str(self.period_time)))
             time.sleep(self.period_time)
@@ -381,3 +440,6 @@ if __name__ == "__main__":
 
     webpoller = WebPoller(page_data["pages"], period_time, logger=logger)
     webpoller.start()
+    for i in range(5):
+        time.sleep(3)
+        print(webpoller.poll_results())

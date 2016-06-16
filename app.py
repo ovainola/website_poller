@@ -10,8 +10,7 @@ current_system = platform.system()
 if current_system not in ["Windows", "Linux"]:
     raise SystemError("Sorry, could not recognize your system. Terminating program")
 
-webpoller, logger = logger_webpoller_factory("settings.conf", {"main": ["time_period", "pages"],
-                                                               "logging": ["settings"]})
+webpoller, logger = logger_webpoller_factory("settings.conf")
 
 @view_config()
 def hello(request):
