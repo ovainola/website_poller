@@ -7,11 +7,10 @@ A small implementation of a program that monitors web sites and reports their
 availability. This tool is intended as a monitoring tool for web site
 administrators for detecting problems on their sites.
 
-The program has a browser interface, which is created via [pyramid](http://www.pylonsproject.org/). The python class, which polls
-for sites and their availability has following dependencies:
+The program has has following dependencies:
 
- * requests
- * pyramid
+ * [requests](http://docs.python-requests.org/en/master/)
+ * [pyramid](http://www.pylonsproject.org/)
 
  ### How it works
 
@@ -60,3 +59,14 @@ Hooks to string functions, f.ex. "__len__", to the html strings are got with get
 this method, f.ex. in the case of "__contains__": "foo" and "bar". Then the
 output is check using equality operator with second argument, f.ex. in the case of "__contains__": "True" and "False". Output is a list of booleans, which
 again are printed in the log file.
+
+
+ ### How do I use it?
+
+ Clone it, install requirements, change settings and apply:
+
+ ```
+ python app.py
+ ```
+
+Open your favorite browser and apply url http://localhost:8080.

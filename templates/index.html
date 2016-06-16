@@ -1,0 +1,40 @@
+{% raw %}
+<!doctype html>
+<html>
+<head>
+  <!-- Ladataan bootstrap -->
+  <link href="/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- lisää templateja -->
+  <link rel="stylesheet" href="/css/jumbotron-narrow.css">
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.16/angular-resource.min.js"></script>
+
+  <title>Hello from Flask</title>
+</head>
+
+
+<body ng-app="ngApp">
+  <script src="/js/page_controller.js"></script>
+  <div class="container">
+    <div class="jumbotron">
+      <h1>Website poller</h1>
+      <h3>by Olli Väinölä</h3>
+    </div>
+
+
+    <div ng-controller="customersCtrl">
+
+
+
+    <ul>
+      <li ng-repeat="x in myData">
+        {{ x.Name + ', ' + x.Country }}
+      </li>
+    </ul>
+    </div>
+</body>
+
+
+</html>
+{% endraw %}

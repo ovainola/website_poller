@@ -9,9 +9,9 @@ import os
 import sys
 
 if sys.version_info.major == 3:
-    import configparser
+    from configparser import ConfigParser
 else:
-    import ConfigParser
+    from ConfigParser import ConfigParser
 
 
 # All the official connection types
@@ -81,10 +81,10 @@ EXCEPTED_SECTIONS = {"main": ["time_period", "pages"],
                      "logging": ["settings"]}
 
 def logger_webpoller_factory(settings_file, sections=EXCEPTED_SECTIONS):
-    """
+    """ Factory for creating webpoller and logger for main application
     """
     # Create config parser and read configs
-    config = ConfigParser.ConfigParser()
+    config = ConfigParser()
     vals = config.read(settings_file)
     if len(vals) == 0:
         raise IOError("Given settings file is empty. Please check the settings file's path.")
@@ -123,7 +123,7 @@ def check_settings_sections(config, necessary_sections):
             raise ValueError("Not all {0} section items present in settings. Necessary {0} sections items:".format(each) +
                              " ,".join(*sections) )
 
-def time_decorator(func):
+def _time_decorator(func):
     """Decorator, for clocking the response time
 
     Parameters
@@ -147,7 +147,7 @@ def time_decorator(func):
         return vals, spent_time
     return class_method_deco
 
-@time_decorator
+@_time_decorator
 def get_html(url, logger=None):
     """Fetches url using requests package.
 
@@ -199,7 +199,7 @@ def _rule_mapper(hook, searched_value, expected_value):
     return str(return_val)
 
 
-def check_rule_output(rules, resp_as_text):
+def check_rule_output(rules, resp_as_text, logger=None):
     """Checks if given string contains the defined rules
 
     Parameters
@@ -220,9 +220,18 @@ def check_rule_output(rules, resp_as_text):
     """
     expected_values = {}
     for method, expected in rules.items():
-        method_hook = getattr(resp_as_text, method)
-        hook_wrapper = lambda x: _rule_mapper(method_hook, x[0], x[1])
-        expected_values[method] = map(hook_wrapper, expected)
+        try:
+            method_hook = getattr(resp_as_text, method)
+            hook_wrapper = lambda x: _rule_mapper(method_hook, x[0], x[1])
+            map_vals = map(hook_wrapper, expected)
+        except AttributeError as err:
+            if logger != None:
+                logger.error(err)
+            else:
+                print(err)
+            map_vals = []
+        finally:
+            expected_values[method] = map_vals
     return expected_values
 
 
@@ -315,8 +324,8 @@ class WebPoller(threading.Thread):
             formatter = logging.Formatter(
                     '%(asctime)s %(name) %(levelname) %(message)s')
             handler.setFormatter(formatter)
-            logger.addHandler(handler)
-            logger.setLevel(logging.INFO)
+            self.logger.addHandler(handler)
+            self.logger.setLevel(logging.INFO)
         else:
             self.logger = logger
 
@@ -324,8 +333,7 @@ class WebPoller(threading.Thread):
         """Initialize polling dictionary, in which the results are stored
         """
         self.poll_dict = {}
-        for each in self.poll_sites.items():
-            url, vals = each
+        for url in self.poll_sites.keys():
             self.poll_dict[url] = {}
             self.poll_dict[url]["status_code"]   = -1
             self.poll_dict[url]["response_time"] = -1
@@ -347,11 +355,11 @@ class WebPoller(threading.Thread):
                     rules = vals["rules"]
                     resp_obj = response["obj"]
                     resp_as_text = resp_obj.text
-                    rule_output = check_rule_output(rules, resp_as_text)
+                    rule_output = check_rule_output(rules, resp_as_text, self.logger)
                     status_code_list = response["status_code"]
                 else:
                     rule_output = []
-                print(response)
+                
                 # Update values to poll dictionary
                 self.poll_dict[url]["status_code"]   = response["status_code"]
                 self.poll_dict[url]["response_time"] = resp_time

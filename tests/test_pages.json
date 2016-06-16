@@ -1,0 +1,21 @@
+{
+  "pages": {
+    "https://github.com/": {
+      "rules": {
+        "__contains__": [["Git", "True"], ["team", "True"]],
+        "find": [["Oulun", 125]]}
+      },
+    "https://twitter.com/": {
+      "rules": {
+        "__contains__": [["twitter", "True"]]}
+      },
+    "http://www.amica.fi/": {
+      "rules": {
+        "count":  [["Amica", "17"]]}
+      },
+     "http://httpbin.org/status/404": {
+       "rules": {
+         "count":  [["code", "1"]]}
+      }
+   }
+}
