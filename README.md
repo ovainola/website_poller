@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/ovainola/website_poller.svg?branch=master)](https://travis-ci.org/ovainola/website_poller)
 
+[![Coverage Status](https://coveralls.io/repos/github/ovainola/website_poller/badge.svg?branch=master)](https://coveralls.io/github/ovainola/website_poller?branch=master)
 
 ## WebPoller
 
