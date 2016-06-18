@@ -6,8 +6,8 @@ install:
   - pip install requests
   - pip install pyramid
   - pip install numpy
-  - pip install coverage
+  - pip install coveralls 
 script:
-  nosetests --with-coverage
+  nosetests --with-coverage --cover-package=WebPoller
 after_success:
   coveralls
