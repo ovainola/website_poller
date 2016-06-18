@@ -27,9 +27,9 @@
     <ul>
       <div ng-repeat="x in site_data">
         <h3 ng-style="set_color(x.status_code[1])">{{ x.name }}</h3>
-         <p style="margin-left: 4em">Connected: {{ x.connected}} | 
-        Response time: {{ x.response_time }} seconds |
-        Status: {{ x.status_code[0] }}
+         <p style="margin-left: 4em"><b>Connected</b>: {{ x.connected}} | 
+        <b>Response time</b>: {{ x.response_time }} seconds |
+        <b>Status</b>: {{ x.status_code[0] }}
         <div class="hr"/>
     </div>
     <p/>

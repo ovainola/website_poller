@@ -81,7 +81,7 @@ EXCEPTED_SECTIONS = {"main": ["time_period", "pages"],
                      "logging": ["settings"]}
 
 def logger_webpoller_factory(settings_file, sections=EXCEPTED_SECTIONS):
-    """ Factory for creating webpoller and logger for main application
+    """ Factory for creating webpoller and logger in main application
     """
     # Create config parser and read configs
     config = ConfigParser()

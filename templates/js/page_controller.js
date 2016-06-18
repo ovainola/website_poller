@@ -9,8 +9,16 @@ ListController = (function() {
     this.scope = scope;
     this.http = http;
     this.timeout = timeout;
-    this.scope.set_color = function(x) {
-      return set_color(x);
+    this.scope.set_color = function(status_code) {
+      if (status_code !== 200) {
+        return {
+          color: "red"
+        };
+      } else {
+        return {
+          color: "green"
+        };
+      }
     };
     this.poll_page();
     this.intervalFunction();
@@ -35,18 +43,6 @@ ListController = (function() {
         return _this.scope.site_data = result.data;
       };
     })(this));
-  };
-
-  ListController.prototype.set_color = function(status_code) {
-    if (status_code !== 200) {
-      return {
-        color: "red"
-      };
-    } else {
-      return {
-        color: "green"
-      };
-    }
   };
 
   return ListController;

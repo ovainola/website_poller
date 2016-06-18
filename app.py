@@ -14,7 +14,7 @@ webpoller, logger = logger_webpoller_factory("settings.conf")
 webpoller.start()
 
 def change_to_json(poll_values):
-    """
+    """ Change the python dict into json structure.
     """
     all_vals = []
     for name, site_vals in poll_values.items():
@@ -31,7 +31,6 @@ def change_to_json(poll_values):
             as_json["rule_output"].append(r_output)
         all_vals.append(as_json)
     return all_vals
-
 
 @app.route('/', methods=['GET', 'POST'])
 def hello():

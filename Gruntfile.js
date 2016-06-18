@@ -1,4 +1,4 @@
-// Gruntfile.js
+// Gruntfile for building coffee script
 module.exports = function(grunt){
   grunt.initConfig({
     coffee: {

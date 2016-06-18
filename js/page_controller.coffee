@@ -1,12 +1,14 @@
 app = angular.module('ngApp', ['ngResource'])
 
-
 class ListController
 
   @$inject: ['$scope', '$http', '$timeout']
   constructor: (@scope, @http, @timeout) ->
-    @scope.set_color = (x) ->
-      set_color(x)
+    @scope.set_color = (status_code) ->
+      if status_code != 200
+        return {color: "red"}
+      else
+        return {color: "green"}
     @poll_page()
     @intervalFunction()
 
@@ -21,10 +23,6 @@ class ListController
     request.then (result) =>
       @scope.site_data = result.data
 
-  set_color: (status_code) ->
-    if status_code != 200
-      return {color: "red"}
-    else
-      return {color: "green"}
+
 
 app.controller 'ListController', ListController

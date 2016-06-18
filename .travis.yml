@@ -6,4 +6,8 @@ install:
   - pip install requests
   - pip install pyramid
   - pip install numpy
-script: nosetests
+  - pip install coverage
+script:
+  nosetests --with-coverage
+after_success:
+  coveralls

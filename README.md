@@ -48,7 +48,7 @@ where the urls and rules for given sites are defined. In the logging section the
 }
 ```
 
-Sites and urls as keywords are obvious, but in the rules, there are some things
+Urls as keywords are obvious, but in the rules, there are some things
 to note. When a html site is fetched using requests, rules are applied to that page
 to check the content. As seen above, "__contains__" and "__len__" are string methods,
 and used as keywords here. Values for these keywords are list of lists, in which
@@ -57,9 +57,10 @@ inside a list: ["None", 125]. The first element is the string method argument an
 the second is the expected value. In the implementation html pages is stored as strings.
 Hooks to string functions, f.ex. "__len__", to the html strings are got with getattr -function. When a hook to a string method is created, arguments are passed into
 this method, f.ex. in the case of "__contains__": "foo" and "bar". Then the
-output is check using equality operator with second argument, f.ex. in the case of "__contains__": "True" and "False". Output is a list of booleans, which
-again are printed in the log file.
+output is check using equality operator with second argument, f.ex. in the case of "__contains__": "True" and "False". Output is a list of booleans.
 
+In the logfile, (default file: logs/webpoller.log), are printed urls, response
+times, status of the request (code and details) and output of the rules.
 
 ### How do I use it?
 
@@ -69,4 +70,9 @@ again are printed in the log file.
  python app.py
  ```
 
-Open your favorite browser and apply url http://localhost:5000.
+Open your favorite browser and apply url http://localhost:5000. If you want to
+run just the webpoller without browser interface, go to poller folder and:
+
+```
+python WebPoller.py
+```
