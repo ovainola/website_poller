@@ -10,7 +10,7 @@ administrators for detecting problems on their sites.
 The program has has following dependencies:
 
  * [requests](http://docs.python-requests.org/en/master/)
- * [pyramid](http://www.pylonsproject.org/)
+ * [flask](http://flask.pocoo.org/)
 
  ### How it works
 
@@ -61,7 +61,7 @@ output is check using equality operator with second argument, f.ex. in the case 
 again are printed in the log file.
 
 
- ### How do I use it?
+### How do I use it?
 
  Clone it, install requirements, change settings and apply:
 
@@ -69,4 +69,4 @@ again are printed in the log file.
  python app.py
  ```
 
-Open your favorite browser and apply url http://localhost:8080.
+Open your favorite browser and apply url http://localhost:5000.

@@ -337,7 +337,7 @@ class WebPoller(threading.Thread):
             self.poll_dict[url] = {}
             self.poll_dict[url]["status_code"]   = -1
             self.poll_dict[url]["response_time"] = -1
-            self.poll_dict[url]["rule_output"]   = []
+            self.poll_dict[url]["rule_output"]   = {}
             self.poll_dict[url]["connected"]     = "False"
 
     def run(self):
@@ -358,8 +358,8 @@ class WebPoller(threading.Thread):
                     rule_output = check_rule_output(rules, resp_as_text, self.logger)
                     status_code_list = response["status_code"]
                 else:
-                    rule_output = []
-                
+                    rule_output = {}
+
                 # Update values to poll dictionary
                 self.poll_dict[url]["status_code"]   = response["status_code"]
                 self.poll_dict[url]["response_time"] = resp_time

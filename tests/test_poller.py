@@ -165,7 +165,7 @@ ae
 
         starting_status = {"status_code": -1,
                            "response_time": -1,
-                           "rule_output": [],
+                           "rule_output": {},
                            "connected": "False"}
 
         poll_dict = {"https://github.com/": starting_status,
