@@ -432,7 +432,7 @@ class WebPoller(threading.Thread):
                                         },
                         }
         """
-        self.poll_sites = json_pages
+        self.poll_sites  = self._check_pollsite_structure(json_pages)
         self._init_status_dict()
 
     def change_period_time(self, new_period_time):
@@ -443,7 +443,7 @@ class WebPoller(threading.Thread):
         new_period_time: int or float
             New period time
         """
-        self.period_time = new_period_time
+        self.period_time = self._check_period_time(new_period_time)
 
     def poll_results(self):
         """Returns the results from recent poll

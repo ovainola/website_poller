@@ -152,7 +152,7 @@ ae
             map(lambda x: self.assertTrue(bool(name[x]) == bool(orig_vals[x])), np.arange(len(orig_vals)))
 
     def test_check_rule_output_2(self):
-        """ tet for checking rule output """
+        """ Test for checking rule output """
         st = """
     test
     """
@@ -189,6 +189,57 @@ ae
         self.assertTrue(webpoller.poll_dict == poll_dict)
         self.assertTrue(webpoller.poll_sites == pages)
         self.assertTrue(webpoller.period_time == period_time)
+
+    def test_init_WebPoller_change_pollpages(self):
+        """ Testing initializing WebPoller and changing pollpages """
+        pages_init = {"https://github.com/": {
+                    "rules": {
+                        "__contains__": [["Git", "True"], ["team", "True"]],
+                        "find": [["Oulun", 125]]}
+                    },
+                "https://twitter.com/": {
+                    "rules": {
+                        "__contains__": [["twitter", "True"]]}
+                    }
+                }
+        pages_out = {"https://github.com/": {
+                    "rules": {
+                        "__contains__": [["Git", "True"], ["team", "True"]],
+                        "find": [["Oulun", 125]]}
+                    },
+                "https://twitter.com/": {
+                    "rules": {
+                        "__contains__": [["twitter", "True"]]}
+                    },
+                "https://wordpress.com/": {
+                    "rules": {
+                        "__contains__": [["press", "True"]]}
+                    }
+                }
+        period_time = 120.
+        webpoller = WebPoller(pages_init, period_time)
+
+        webpoller.change_poll_pages(pages_out)
+
+        self.assertTrue(webpoller.poll_sites == pages_out)
+
+    def test_init_WebPoller_change_polltime(self):
+        """ Testing initializing WebPoller and change polltime"""
+        pages = {"https://github.com/": {
+                    "rules": {
+                        "__contains__": [["Git", "True"], ["team", "True"]],
+                        "find": [["Oulun", 125]]}
+                    },
+                "https://twitter.com/": {
+                    "rules": {
+                        "__contains__": [["twitter", "True"]]}
+                    }
+                }
+        period_time = 120.
+        period_time_new = 20.
+        webpoller = WebPoller(pages, period_time)
+        webpoller.change_period_time(period_time_new)
+        self.assertTrue(webpoller.period_time == period_time_new)
 
     def test_init_WebPoller_fail(self):
         """ Testing initializing WebPoller but fail because period_time != number """
