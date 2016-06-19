@@ -82,12 +82,22 @@ EXCEPTED_SECTIONS = {"main": ["time_period", "pages"],
 
 def logger_webpoller_factory(settings_file, sections=EXCEPTED_SECTIONS):
     """ Factory for creating webpoller and logger in main application
+
+    Parameters
+    ----------
+        settings_file: string
+            Path to settings.conf file
+
+    Returns
+    -------
+        WebPoller, logger
+            newly created webpoller and logger for main program.
     """
     # Create config parser and read configs
     config = ConfigParser()
     vals = config.read(settings_file)
     if len(vals) == 0:
-        raise IOError("Given settings file is empty. Please check the settings file's path.")
+        raise IOError("Given settings does not exist. Please check the settings file's path.")
 
     check_settings_sections(config, sections)
 
@@ -110,9 +120,18 @@ def logger_webpoller_factory(settings_file, sections=EXCEPTED_SECTIONS):
     return webpoller, main_logger
 
 def check_settings_sections(config, necessary_sections):
-    """
+    """ Function for checking if all the necessary sections are
+    presented in the settings.conf file
+
+    Parameters
+    ----------
+        config: ConfigParser
+            ConfigParser, in which the settings file has been read.
     """
     keys = necessary_sections.keys()
+    if len(config.sections()) == 0:
+        raise ValueError("Given settings file is empty. Please check your settings.conf")
+
     if not all([x in necessary_sections.keys() for x in config.sections()]):
         raise ValueError("Not all section present in settings. Necessary sections names: %s" % ", ".join(*keys))
 
@@ -187,7 +206,21 @@ def get_html(url, logger=None):
     return res
 
 def _rule_mapper(hook, searched_value, expected_value):
-    '''
+    ''' Function, which used in a map function.
+
+    Parameters
+    ----------
+        hook: function
+            Rule function from settings
+        searched_value: string
+            String argument
+        expected_value: string
+            Excepted output
+
+    Returns
+    -------
+        string
+            Boolean string
     '''
     searched_as_string = str(searched_value)
     expected_as_string = str(expected_value)
@@ -340,40 +373,45 @@ class WebPoller(threading.Thread):
             self.poll_dict[url]["rule_output"]   = {}
             self.poll_dict[url]["connected"]     = "False"
 
+    def get_pages(self):
+        """ Main function for searching pages
+        """
+        for each in self.poll_sites.items():
+            url, vals = each
+            response, resp_time = get_html(url, self.logger)
+
+            # If was able to connect to server
+            if response["connected"]:
+                rules = vals["rules"]
+                resp_obj = response["obj"]
+                resp_as_text = resp_obj.text
+                rule_output = check_rule_output(rules, resp_as_text, self.logger)
+                status_code_list = response["status_code"]
+            else:
+                rule_output = {}
+
+            # Update values to poll dictionary
+            self.poll_dict[url]["status_code"]   = response["status_code"]
+            self.poll_dict[url]["response_time"] = resp_time
+            self.poll_dict[url]["rule_output"]   = rule_output
+            self.poll_dict[url]["connected"]     = str(response["connected"])
+
+            # Print output to log
+            self.logger.info("Fetching {0}:".format(url))
+            self.logger.info(" *** Response time: {0:.3f} seconds.".format(resp_time))
+            self.logger.info(" *** Status: {0}, code: {1}.".format(*status_code_list))
+            for rule_name, list_vals in rule_output.items():
+                self.logger.info(" *** Rule: {0}, output: {1}".format(rule_name, ", ".join(list_vals)))
+
+        self.logger.info(" ---- Sleeping {0} seconds ---- ".format(str(self.period_time)))
+
     def run(self):
         """Thread function
 
         This is the async function, in which the sites are gathered and processed
         """
         while True:
-            for each in self.poll_sites.items():
-                url, vals = each
-                response, resp_time = get_html(url, self.logger)
-
-                # If was able to connect to server
-                if response["connected"]:
-                    rules = vals["rules"]
-                    resp_obj = response["obj"]
-                    resp_as_text = resp_obj.text
-                    rule_output = check_rule_output(rules, resp_as_text, self.logger)
-                    status_code_list = response["status_code"]
-                else:
-                    rule_output = {}
-
-                # Update values to poll dictionary
-                self.poll_dict[url]["status_code"]   = response["status_code"]
-                self.poll_dict[url]["response_time"] = resp_time
-                self.poll_dict[url]["rule_output"]   = rule_output
-                self.poll_dict[url]["connected"]     = str(response["connected"])
-
-                # Print output to log
-                self.logger.info("Fetching {0}:".format(url))
-                self.logger.info(" *** Response time: {0:.3f} seconds.".format(resp_time))
-                self.logger.info(" *** Status: {0}, code: {1}.".format(*status_code_list))
-                for rule_name, list_vals in rule_output.items():
-                    self.logger.info(" *** Rule: {0}, output: {1}".format(rule_name, ", ".join(list_vals)))
-
-            self.logger.info(" ---- Sleeping {0} seconds ---- ".format(str(self.period_time)))
+            self.get_pages()
             time.sleep(self.period_time)
 
     def change_poll_pages(self, json_pages):

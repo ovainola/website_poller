@@ -32,20 +32,35 @@ class WebPollerTester(unittest.TestCase):
 
     def test_logger_webpoller_factory(self):
         """ Check that building webpoller is successful """
-        print(this_folder)
         webpoller, main_logger = logger_webpoller_factory(this_folder + "/test_settings.conf")
         self.assertTrue(True)
+
+    def test_poller_get_page(self):
+        """ Check that building webpoller is successful and gething page is ok """
+        webpoller, main_logger = logger_webpoller_factory(this_folder + "/test_settings.conf")
+        webpoller.get_pages()
+        self.assertTrue(webpoller.poll_dict[u"http://httpbin.org/status/404"]["connected"] == "True")
+        self.assertTrue(webpoller.poll_dict[u"http://httpbin.org/status/404"]["status_code"][1] == 404)
+
+    def test_factory_empty_settings(self):
+        """ Check that factory fails with empty settings """
+        self.assertRaises(ValueError, logger_webpoller_factory, this_folder + "/test_empty_settings.conf")
+
+    def test_factory_empty_settings_2(self):
+        """ Check that factory fails with empty settings """
+        config = ConfigParser()
+        config.read("{}")
+        self.assertRaises(ValueError, check_settings_sections, config, EXCEPTED_SECTIONS)
+
+    def test_factory_no_settings_file(self):
+        """ Check that factory fails when file doen't exist """
+        self.assertRaises(IOError, logger_webpoller_factory, this_folder + "/doesnt_exist.conf")
 
     def test_check_settings_sections(self):
         """ Test check settings """
         config = ConfigParser()
         config.read(this_folder + "/test_settings.conf")
         check_settings_sections(config, EXCEPTED_SECTIONS)
-
-    def test_check_settings_sections_2(self):
-        config = ConfigParser()
-        config.read("{}")
-        self.assertRaises(NoSectionError, check_settings_sections, config, EXCEPTED_SECTIONS)
 
     def test_time_decorator(self):
         """ Test for time decorator """
