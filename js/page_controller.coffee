@@ -1,4 +1,4 @@
-app = angular.module('ngApp', ['ngResource'])
+
 
 class ListController
 
@@ -24,5 +24,5 @@ class ListController
       @scope.site_data = result.data
 
 
-
+app = angular.module('pollApp', ['ngResource'])
 app.controller 'ListController', ListController

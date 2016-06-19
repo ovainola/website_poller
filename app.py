@@ -10,9 +10,6 @@ current_system = platform.system()
 if current_system not in ["Windows", "Linux"]:
     raise SystemError("Sorry, could not recognize your system. Terminating program")
 
-webpoller, logger = logger_webpoller_factory("settings.conf")
-webpoller.start()
-
 def change_to_json(poll_values):
     """ Change the python dict into json structure.
     """
@@ -55,4 +52,6 @@ if __name__ == "__main__":
     local_url = '0.0.0.0'
     port = 5000
     print("Starting Flask server: http://{0}:{1}".format(local_url, port))
+    webpoller, logger = logger_webpoller_factory("settings.conf")
+    webpoller.start()
     app.run()

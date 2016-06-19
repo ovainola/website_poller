@@ -1,7 +1,5 @@
 var ListController, app;
 
-app = angular.module('ngApp', ['ngResource']);
-
 ListController = (function() {
   ListController.$inject = ['$scope', '$http', '$timeout'];
 
@@ -48,5 +46,7 @@ ListController = (function() {
   return ListController;
 
 })();
+
+app = angular.module('pollApp', ['ngResource']);
 
 app.controller('ListController', ListController);
