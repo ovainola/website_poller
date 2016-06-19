@@ -454,38 +454,3 @@ class WebPoller(threading.Thread):
             Values of the recent poll
         """
         return self.poll_dict
-
-
-
-if __name__ == "__main__":
-    # this if part is mainly for testing WebPoller on solo
-    import logging
-    from logging.config import fileConfig
-    import ConfigParser
-    import json
-    import numpy as np
-    import os
-    import time
-
-    filepath = os.path.abspath("__main__")
-    previous_folder = "/".join(np.array(filepath.split("/"))[:-2])
-    os.chdir(previous_folder)
-    settings = "settings.conf"
-
-    config = ConfigParser.ConfigParser()
-    config.read(settings)
-
-    period_time = config.get("main", "time_period")
-    logging_settings = config.get("logging", "settings")
-    fileConfig(logging_settings)
-    logger = logging.getLogger("webpoller")
-
-    page_file = config.get("main", "pages")
-    with open(page_file, "r") as f:
-        page_data = json.load(f)
-
-    webpoller = WebPoller(page_data["pages"], period_time, logger=logger)
-    webpoller.start()
-    for i in range(5):
-        time.sleep(3)
-        print(webpoller.poll_results())
