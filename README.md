@@ -1,8 +1,9 @@
 [![Build Status](https://travis-ci.org/ovainola/website_poller.svg?branch=master)](https://travis-ci.org/ovainola/website_poller)
 
-<a href='https://coveralls.io/github/ovainola/website_poller?branch=master'><img src='https://coveralls.io/repos/github/ovainola/website_poller/badge.svg?branch=master' alt='Coverage Status' /></a>
+[![Coverage Status](https://coveralls.io/repos/github/ovainola/website_poller/badge.svg?branch=master)](https://coveralls.io/github/ovainola/website_poller?branch=master)
 
-### WebPoller
+
+# WebPoller
 
 An implementation of a program that monitors web sites and reports their
 availability. This tool is intended as a monitoring tool for web site
@@ -13,7 +14,8 @@ The program has has following dependencies:
  * [requests](http://docs.python-requests.org/en/master/)
  * [flask](http://flask.pocoo.org/)
 
- ### How it works
+
+### How it works
 
  Web application uses ConfigParser to read the settings.conf file for necessary
  information. The settings.conf has a following structure:
