@@ -71,6 +71,16 @@ When all the rule arguments are tested function returns a list of booleans.
 In the logfile are printed urls, response times, status of the request
 (code and details) and output of the rules.
 
+Used javascript development tools:
+
+ * [CoffeeScript](http://coffeescript.org/)
+
+ * [Grunt](http://gruntjs.com/)
+
+ * [Karma](https://karma-runner.github.io/0.13/index.html)
+
+ * [Jasmine](http://jasmine.github.io/)
+
 ### How do I use it?
 
  Clone it, install requirements, change settings and apply:
